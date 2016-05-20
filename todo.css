@@ -1,0 +1,25 @@
+.todo {
+    height: 30px;
+    width: 200px;
+    padding: 10px;
+    font-size: 15px;
+}
+
+body {
+    margin-top: 2%;
+    margin-left: 10%;
+}
+
+#bttnAdd {
+    height: 50px;
+    font-size: 25px;
+    padding: 10px;
+}
+
+.deleted {
+    text-decoration: line-through;
+}
+
+li span {
+    margin-right:  30px;
+}

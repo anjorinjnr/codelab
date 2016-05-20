@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body style="margin-top: 40px;">
+<input type="text" class="input" id="inpt1" onblur="App.compute(event)">
+
+<select name="" id="selOpt">
+  <option value="+">+</option>
+  <option value="*">*</option>
+</select>
+<input type="text" onblur="App.compute(event)" id="inpt2">
+
+<span> = </span>
+
+<input type="text" id="ans">
+
+
+<br>
+
+<button onclick="App.compute(event)">Compute</button>
+
+
+<script src="code.js"></script>
+</body>
+</html>

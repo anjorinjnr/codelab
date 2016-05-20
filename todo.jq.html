@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+<div>
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">Best Todo App</div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-8">
+              <input class="form-control todo-input" type="text" placeholder="Enter your todo">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-default" id="add">Add Task</button>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 40px;">
+            <div class="col-md-12">
+
+              <ul id="todolist" class="list-group">
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+<script>
+  $(function () {
+
+    $('#todolist').on('click', '.del', function (e, elem) {
+      $(this).prev().addClass('deleted');
+    });
+
+    $('#add').click(function () {
+      $('#todolist').append('<li class="list-group-item"><span>' + $('.todo-input').val() + '</span> <a  href="#" class="del" style="float:right" >x</a> </li>');
+    });
+  });
+</script>
+</body>
+</html>

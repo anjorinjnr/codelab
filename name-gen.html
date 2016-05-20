@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div class="row">
+  <div class="col-md-12">
+    <input style="height:30px; width:300px;padding:5px;font-size:20px"
+           placeholder="Enter your name" type="text" id="txt_name">
+  </div>
+
+</div>
+
+<div class="row" style="margin-top:50px">
+  <div style="background-color:red; height:200px; width:350px; border-radius:10px">
+    <div style="text-align:center;padding-top:1px">
+      <h1 style="color:#fff;margin-bottom:5px;">HELLO</h1>
+      <h3 style="padding:0;margin:0;color:#fff;">my name is:</h3>
+    </div>
+    <div style="background-color:#fff;height:60px;
+     text-align:center;
+     margin:10px;padding:10px">
+      <h1 id="name"></h1>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function () {
+    document.getElementById('txt_name').onkeyup = greet;
+    function greet() {
+      document.getElementById('name').innerHTML = document.getElementById('txt_name').value;
+    };
+  }());
+</script>
+
+</body>
+</html>

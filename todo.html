@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+<div>
+  <input class="todo" type="text" placeholder="Enter your todo">
+  <button id="bttnAdd" onclick="add()">Add Task</button>
+</div>
+<ul id="todolist">
+
+</ul>
+
+<script>
+  var listAr = [];
+  function add() {
+    var todo = document.getElementsByClassName('todo')[0];
+    //console.log(todo.value);
+
+    //li
+
+  //span
+  //button
+    var list = document.getElementById('todolist');
+
+    var tskLi = document.createElement('li');
+
+    var valSpan = document.createElement('span');
+    valSpan.innerText = todo.value;
+
+    var delbutton = document.createElement('button');
+    delbutton.innerText = 'X';
+    delbutton.onclick = function (event) {
+      event.target.previousSibling.className = 'deleted';
+
+    };
+
+    tskLi.appendChild(valSpan);
+
+    tskLi.appendChild(delbutton);
+    //tskLi.innerHTML = todo.value +  '  <a>X</a>';
+//    listAr.push('<li>' + todo.value + '</li>');
+    //list.innerHTML = listAr.join('');
+    list.appendChild(tskLi);
+  }
+</script>
+</body>
+</html>
