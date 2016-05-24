@@ -7,7 +7,7 @@
 </head>
 <body>
 <div>
-  <input class="todo" type="text" placeholder="Enter your todo">
+  <input class="todo" type="text" placeholder="Enter your todo" onkeypress="entr(event)">
   <button id="bttnAdd" onclick="add()">Add Task</button>
 </div>
 <ul id="todolist">
@@ -16,6 +16,13 @@
 
 <script>
   var listAr = [];
+
+  function  entr(event){
+    if(event.keyCode == 13)
+    {
+      add();
+    }
+  }
   function add() {
     var todo = document.getElementsByClassName('todo')[0];
     //console.log(todo.value);
