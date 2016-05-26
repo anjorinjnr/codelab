@@ -17,7 +17,7 @@
         <div class="panel-body">
           <div class="row">
             <div class="col-md-8">
-              <input class="form-control todo-input" type="text" placeholder="Enter your todo">
+              <input id="todo" class="form-control todo-input" type="text" placeholder="Enter your todo">
             </div>
             <div class="col-md-4">
               <button class="btn btn-default" id="add">Add</button>
@@ -28,6 +28,17 @@
             <div class="col-md-12">
 
               <ul id="todolist" class="list-group">
+			<!--		<li class="list-group-item">
+					    <div class="task-item">
+							<span>Eat</span>
+							<a  href="#" class="del" style="float:right" >x</a> 
+							<a href="#" class="notes" style="float:left; padding-right:5px;">+</a> 
+						</div>
+						<div class="task-note">
+						 <textarea></textarea> <br>
+						 <button>Save</button>
+						</div>
+				   </li>-->			
               </ul>
             </div>
 
@@ -42,16 +53,64 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+
 <script>
-  $(function () {
+
+ var  todos = [];
+ var addTaskToList = function(val){
+  
+  
+ //create tsk object
+ 
+ //add to todo add
+ 
+ //add task to html
+  $('#todolist').append('<li class="list-group-item"> <div class="task-item"><span class ="item_span" id=' + todos.length +'>' + val
+        + '</span> <a href="#" class="del" style="float:right" >x</a> ' 
+        + '<a href="#" class="notes" style="float:left; padding-right:5px;">+</a></div>'
+		+ '</li>');
+  $('.todo-input').val(" ");
+  var todo_item = {id : todos.length, item_val : val, notes_val: ""};
+  todos.push(todo_item);
+ };
+
+  
+
+ $(function () {
+     $('#todolist').on('click', '.notes', function (e, elem) {
+	    if(!$(this).hasClass('expanded')) {
+			$(this).addClass('expanded');
+			var id = $(this).prev().prev().attr("id");
+	        $(this).parent().append('<div class="task-note"> <textarea class="note_text">'+ todos[id].notes_val +
+ 			'</textarea> <br> <button class="sav btn btn-default">Save</button> </div>')
+		}
+	});
+	
+	$('#todolist').on('click', '.sav', function (e, elem) {
+	  $(this).parent().parent().find('.notes').removeClass('expanded');
+	 
+	  var id = $(this).parent().parent().find('.item_span').attr("id");
+	  todos[id].notes_val = $(this).prev().prev().val();
+	   $(this).parent().remove('.task-note');
+	  
+    });
 
     $('#todolist').on('click', '.del', function (e, elem) {
       $(this).prev().addClass('deleted');
     });
 
     $('#add').click(function () {
-      $('#todolist').append('<li class="list-group-item"><span>' + $('.todo-input').val() + '</span> <a  href="#" class="del" style="float:right" >x</a> </li>');
-    });
+	  addTaskToList( $('.todo-input').val());
+         });
+	
+	$('#todo').keypress(function(event){
+		if(event.which == 13)
+		{
+		    addTaskToList( $('.todo-input').val());
+		   }
+	});
+	
+	
   });
 </script>
 </body>
