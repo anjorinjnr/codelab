@@ -21,6 +21,7 @@
             </div>
             <div class="col-md-4">
               <button class="btn btn-default" id="add">Add</button>
+			  <input type = "checkbox" id ="search_b"> Search 
             </div>
           </div>
 
@@ -28,7 +29,7 @@
             <div class="col-md-12">
 
               <ul id="todolist" class="list-group">
-			<!--		<li class="list-group-item">
+				<!--	<li class="list-group-item">
 					    <div class="task-item">
 							<span>Eat</span>
 							<a  href="#" class="del" style="float:right" >x</a> 
@@ -53,6 +54,7 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+<script src="http://marak.com/faker.js/js/faker.js"></script>
 
 <script>
 
@@ -74,9 +76,31 @@
   todos.push(todo_item);
  };
 
-  
+ var add_note = function(not)
+ {
+	
+ };
+ 
+ var search = function (arr, src_key)
+ {	
+	arr.each(function(i){
+	 if ($(this).find('.item_span').text().indexOf(src_key)== -1)
+	 { $(this).hide();}
+
+	});
+	
+ 
+ };
+ 
+  function seedTodos (n){
+   var i = 0;
+   while(i++ < n) {
+    addTaskToList(faker.lorem.words());
+   }
+  }
 
  $(function () {
+     seedTodos(30);
      $('#todolist').on('click', '.notes', function (e, elem) {
 	    if(!$(this).hasClass('expanded')) {
 			$(this).addClass('expanded');
@@ -100,8 +124,14 @@
     });
 
     $('#add').click(function () {
-	  addTaskToList( $('.todo-input').val());
-         });
+	   if ($(this).text() == "Add")
+	     {addTaskToList( $('.todo-input').val());}
+	   else  {
+		search ($("#todolist").find('li'),$('.todo-input').val());
+	   
+	   }
+		
+		 });
 	
 	$('#todo').keypress(function(event){
 		if(event.which == 13)
@@ -110,6 +140,14 @@
 		   }
 	});
 	
+	$('#search_b').click( function (){
+		if(this.checked)
+		{$('#add').text("Search");
+		}
+		else 
+		{ $('#add').text("Add");}
+		
+	});
 	
   });
 </script>
