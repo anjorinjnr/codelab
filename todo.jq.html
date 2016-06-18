@@ -28,19 +28,15 @@
           <div class="row" style="margin-top: 40px;">
             <div class="col-md-12">
 
-              <ul id="todolist" class="list-group">
-				<!--	<li class="list-group-item">
-					    <div class="task-item">
-							<span>Eat</span>
-							<a  href="#" class="del" style="float:right" >x</a> 
-							<a href="#" class="notes" style="float:left; padding-right:5px;">+</a> 
-						</div>
-						<div class="task-note">
-						 <textarea></textarea> <br>
-						 <button>Save</button>
-						</div>
-				   </li>-->			
+              <ul id="todolist" class="list-group ">
+
               </ul>
+                <nav>
+                  <ul class="pager">
+                    <li id = "prev"><a href="#">Previous</a></li>
+                    <li id = "next"><a href="#">Next</a></li>
+                  </ul>
+                </nav>
             </div>
 
           </div>
@@ -59,64 +55,113 @@
 <script>
 
  var  todos = [];
+ var  page = {curr_last_item :"", curr_first_item:"", curr_pg :""};
+ /* Add tasks to the arraylist of tasks
+  */
  var addTaskToList = function(val){
-  
-  
- //create tsk object
- 
- //add to todo add
- 
- //add task to html
-  $('#todolist').append('<li class="list-group-item"> <div class="task-item"><span class ="item_span" id=' + todos.length +'>' + val
-        + '</span> <a href="#" class="del" style="float:right" >x</a> ' 
-        + '<a href="#" class="notes" style="float:left; padding-right:5px;">+</a></div>'
-		+ '</li>');
-  $('.todo-input').val(" ");
   var todo_item = {id : todos.length, item_val : val, notes_val: ""};
   todos.push(todo_item);
  };
 
- var add_note = function(not)
- {
-	
+cmd /**/
+ var add_op = function(){
+      $('.todo-input').val("");
+     if (todos.length <= page.curr_pg*10)
+     {
+         console.log(page.curr_pg);
+         display(page.curr_first_item, (page.curr_pg*10)-1)
+     }
  };
- 
- var search = function (arr, src_key)
- {	
-	arr.each(function(i){
-	 if ($(this).find('.item_span').text().indexOf(src_key)== -1)
-	 { $(this).hide();}
 
-	});
-	
- 
+ /* Display the list items based on an upper and lower limit
+  **/
+ var display = function (l_lim, u_lim){
+     $('#todolist').empty();
+     page.curr_first_item = l_lim;
+     for( ; l_lim <= u_lim; l_lim++)
+     {
+         if(todos.length > l_lim){
+             $('#todolist').append('<li class="list-group-item"> <div class="task-item"><span class ="item_span" id=' + todos[l_lim].id+'>' + todos[l_lim].item_val
+                     + '</span> <a href="#" class="del" style="float:right" >x</a> '
+                     + '<a href="#" class="notes" style="float:left; padding-right:5px;">+</a></div>'
+                     + '</li>');
+             page.curr_last_item = l_lim;
+         }
+     }
+     page.curr_pg = (Math.floor(page.curr_last_item/10))+1;
  };
- 
+
+ /*Add notes to a task item, using the arraylist */
+ var add_note = function(id, value)
+ {
+	 todos[id].notes_val = value;
+ };
+
+
+
+ /* Unhides all list items once the search bar is empty
+  **/
+ var unhide_all = function()
+ {
+     var i = $.trim($("#todo").val())
+	 if (i.length == 0){
+		var all_todos = $("#todolist").find('li');
+		all_todos.each(function (){$(this).show();});
+		}
+ };
+
+ /*Search for a particular string(var srch_txt) */
+ var search = function (arr, srch_txt)
+ {
+     srch_txt = $.trim(srch_txt);
+	 arr.each(function(){
+	 if ($(this).find('.item_span').text().indexOf(srch_txt)== -1)
+      {   var id = $(this).find('.item_span').attr("id");
+          if (todos[id].notes_val.indexOf(srch_txt) == -1)
+          { $(this).hide();}
+      }
+	});
+ };
+
+ /* Populate the todo List */
   function seedTodos (n){
-   var i = 0;
-   while(i++ < n) {
-    addTaskToList(faker.lorem.words());
-   }
-  }
+      var i = 0;
+      while(i++ < n) {
+          addTaskToList(faker.lorem.words());
+      }
+  };
+
+ /*Add notes to the list items*/
+ function seedNotes()
+ {
+     for(var i = 0; i < todos.length; i++)
+     { todos[i].notes_val =  faker.lorem.words(); }
+ }
 
  $(function () {
-     seedTodos(30);
+     seedTodos(8);
+     seedNotes();
+     display(0,9);
+
      $('#todolist').on('click', '.notes', function (e, elem) {
 	    if(!$(this).hasClass('expanded')) {
 			$(this).addClass('expanded');
 			var id = $(this).prev().prev().attr("id");
 	        $(this).parent().append('<div class="task-note"> <textarea class="note_text">'+ todos[id].notes_val +
- 			'</textarea> <br> <button class="sav btn btn-default">Save</button> </div>')
+ 			'</textarea> <br> <button class="sav btn btn-default">Save</button>' +
+                             '<button class="cls btn btn-default">Close</button> </div>')
 		}
 	});
-	
+
+     $('#todolist').on('click', '.cls', function (e, elem) {
+         $(this).parent().parent().find('.notes').removeClass('expanded');
+         $(this).parent().remove('.task-note');
+     });
+
 	$('#todolist').on('click', '.sav', function (e, elem) {
-	  $(this).parent().parent().find('.notes').removeClass('expanded');
-	 
-	  var id = $(this).parent().parent().find('.item_span').attr("id");
-	  todos[id].notes_val = $(this).prev().prev().val();
-	   $(this).parent().remove('.task-note');
-	  
+	    var id = $(this).parent().parent().find('.item_span').attr("id");
+        add_note(id,$(this).prev().prev().val());
+	    //todos[id].notes_val = $(this).prev().prev().val();
     });
 
     $('#todolist').on('click', '.del', function (e, elem) {
@@ -125,19 +170,23 @@
 
     $('#add').click(function () {
 	   if ($(this).text() == "Add")
-	     {addTaskToList( $('.todo-input').val());}
+	     {addTaskToList( $('.todo-input').val());
+             add_op();
+         }
 	   else  {
 		search ($("#todolist").find('li'),$('.todo-input').val());
-	   
 	   }
-		
-		 });
-	
+    });
+
+	$('#todo').keyup( function (){
+        unhide_all();
+    });
+
 	$('#todo').keypress(function(event){
 		if(event.which == 13)
-		{
-		    addTaskToList( $('.todo-input').val());
-		   }
+		{ addTaskToList( $('.todo-input').val());
+            add_op();
+        }
 	});
 	
 	$('#search_b').click( function (){
@@ -146,9 +195,24 @@
 		}
 		else 
 		{ $('#add').text("Add");}
-		
 	});
-	
+
+     $('#prev').click(function(){
+         if(page.curr_first_item > 9)
+         {
+             display(page.curr_first_item-10, page.curr_first_item-1);
+         }
+
+     });
+
+     $('#next').click(function(){
+         if(todos.length > page.curr_last_item+1)
+         {
+             display(page.curr_last_item+1, page.curr_last_item+10 );
+         }
+
+     });
+
   });
 </script>
 </body>
