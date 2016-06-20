@@ -86,6 +86,8 @@
   };
 
   var TodoApp = {
+    PAGE_SIZE: 10,
+    tasks: [],
     _setupEventHandlers: function () {
       var self = this;
       //show note
@@ -160,7 +162,6 @@
         self.displayTasks(paginator.nextPage());
       });
     },
-    PAGE_SIZE: 10,
     init: function (seedCount) {
 
       if (seedCount) {
@@ -185,7 +186,6 @@
       this.searchPaginator = new Paginator(results, this.PAGE_SIZE);
       this.displayTasks(this.searchPaginator.nextPage());
     },
-    tasks: [],
     addTask: function (task, notes) {
       notes = notes || '';
       this.tasks.push({id: this.tasks.length, name: task, notes: notes})
@@ -214,7 +214,6 @@
       }
     }
   };
-
 
   $(function () {
     TodoApp.init(20);
