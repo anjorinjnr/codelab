@@ -3,56 +3,222 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link rel="stylesheet" href="todo.css">
 </head>
 <body>
 <div>
-  <input class="todo" type="text" placeholder="Enter your todo" onkeypress="entr(event)">
-  <button id="bttnAdd" onclick="add()">Add Task</button>
-</div>
-<ul id="todolist">
+  <div class="row">
 
-</ul>
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">Best Todo App</div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-8">
+              <input id="todo" class="form-control todo-input" type="text" placeholder="Enter your todo">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-default" id="add">Add</button>
+              <input type="checkbox" id="search_b"> Search
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 40px;">
+            <div class="col-md-12">
+
+              <p id="loading">loading...</p>
+              <ul id="todolist" class="list-group ">
+
+              </ul>
+              <nav>
+                <ul class="pager">
+                  <li id="prev"><a href="#">Previous</a></li>
+                  <li id="next"><a href="#">Next</a></li>
+                </ul>
+              </nav>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+<script src="http://marak.com/faker.js/js/faker.js"></script>
 
 <script>
-  var listAr = [];
+  var Paginator = function (data, itemsPerPage) {
 
-  function  entr(event){
-    if(event.keyCode == 13)
-    {
-      add();
-    }
-  }
-  function add() {
-    var todo = document.getElementsByClassName('todo')[0];
-    //console.log(todo.value);
+    var limit = itemsPerPage;
+    this.data = data.slice(0); //we creating a copy of the data;
+    this.page = 0;
+    this.totalPages = Math.ceil(this.data.length / limit);
 
-    //li
-
-  //span
-  //button
-    var list = document.getElementById('todolist');
-
-    var tskLi = document.createElement('li');
-
-    var valSpan = document.createElement('span');
-    valSpan.innerText = todo.value;
-
-    var delbutton = document.createElement('button');
-    delbutton.innerText = 'X';
-    delbutton.onclick = function (event) {
-      event.target.previousSibling.className = 'deleted';
-
+    //@private
+    this.onPageChange_ = function () {
+      var start = (this.page - 1) * limit;
+      return this.data.slice(start, start + limit);
     };
 
-    tskLi.appendChild(valSpan);
+    this.currentPageData = function () {
+      return this.onPageChange_();
+    };
 
-    tskLi.appendChild(delbutton);
-    //tskLi.innerHTML = todo.value +  '  <a>X</a>';
-//    listAr.push('<li>' + todo.value + '</li>');
-    //list.innerHTML = listAr.join('');
-    list.appendChild(tskLi);
-  }
+    this.nextPage = function () {
+      if (this.page < this.totalPages) {
+        this.page++;
+        return this.onPageChange_();
+      }
+    };
+    this.previousPage = function () {
+      if (this.page > 1) {
+        this.page--;
+        return this.onPageChange_();
+      }
+    };
+  };
+
+  var TodoApp = {
+    _setupEventHandlers: function () {
+      var self = this;
+      //show note
+      $('#todolist').on('click', '.notes', function (e, elem) {
+        if (!$(this).hasClass('expanded')) {
+          $(this).addClass('expanded');
+          var id = $(this).prev().prev().attr("id");
+          $(this).parent().append('<div class="task-note"> <textarea class="note_text">' + self.tasks[id].notes +
+            '</textarea> <br> <button class="sav btn btn-default">Save</button>' +
+            '<button class="cls btn btn-default">Close</button> </div>')
+        }
+      });
+
+      //hide note
+      $('#todolist').on('click', '.cls', function (e, elem) {
+        $(this).parent().parent().find('.notes').removeClass('expanded');
+        $(this).parent().remove('.task-note');
+      });
+
+      //save note
+      $('#todolist').on('click', '.sav', function (e, elem) {
+        var id = $(this).parent().parent().find('.item_span').attr("id");
+        var note = $(this).prev().prev().val();
+        self.updateNote(id, note);
+      });
+
+      //delete task
+      $('#todolist').on('click', '.del', function (e, elem) {
+        $(this).prev().addClass('deleted');
+      });
+
+      //add new task or search task
+      $('#add').click(function () {
+        if ($(this).text() == "Add") {
+          self.addTask($('.todo-input').val());
+        }
+        else {
+          self.search($('.todo-input').val());
+        }
+      });
+
+      $('#todo').keyup(function () {
+        var i = $.trim($("#todo").val());
+        if (i.length == 0) {
+          self.searchMode = false;
+          self.displayTasks(self.paginator.currentPageData());
+        }
+      });
+
+      $('#todo').keypress(function (event) {
+        if (event.which == 13) {
+          self.addTask($('.todo-input').val());
+        }
+      });
+
+      $('#search_b').click(function () {
+        if (this.checked) {
+          $('#add').text("Search");
+        }
+        else {
+          $('#add').text("Add");
+        }
+      });
+
+      $('#prev').click(function () {
+        var paginator = self.searchMode ? self.searchPaginator : self.paginator;
+        self.displayTasks(paginator.previousPage());
+      });
+
+      $('#next').click(function () {
+        var paginator = self.searchMode ? self.searchPaginator : self.paginator;
+        self.displayTasks(paginator.nextPage());
+      });
+    },
+    PAGE_SIZE: 10,
+    init: function (seedCount) {
+
+      if (seedCount) {
+        for (var i = 0; i <= seedCount; i++) {
+          this.addTask(faker.lorem.words(), faker.lorem.words())
+        }
+      }
+      this._setupEventHandlers();
+      this.paginator = new Paginator(this.tasks, this.PAGE_SIZE);
+      this.displayTasks(this.paginator.nextPage());
+    },
+    search: function (searchText) {
+      this.searchMode = true;
+      var results = [];
+      searchText = searchText.toLowerCase().trim();
+      this.tasks.forEach((function (task) {
+        if (task.name.toLowerCase().indexOf(searchText) >= 0 ||
+          task.notes.toLowerCase().indexOf(searchText) >= 0) {
+          results.push(task);
+        }
+      }));
+      this.searchPaginator = new Paginator(results, this.PAGE_SIZE);
+      this.displayTasks(this.searchPaginator.nextPage());
+    },
+    tasks: [],
+    addTask: function (task, notes) {
+      notes = notes || '';
+      this.tasks.push({id: this.tasks.length, name: task, notes: notes})
+    },
+    displayTasks: function (tasks) {
+      if ($.isArray(tasks) && tasks.length > 0) {
+        $('#loading').show();
+        $('.pager').hide();
+
+        $('#todolist').empty().hide();
+        tasks.forEach(function (task) {
+          $('#todolist').append('<li class="list-group-item"> <div class="task-item"><span class ="item_span" id=' +
+            task.id + '>' + task.name
+            + '</span> <a href="#" class="del" style="float:right" >x</a> '
+            + '<a href="#" class="notes" style="float:left; padding-right:5px;">+</a></div>'
+            + '</li>');
+        });
+        $('#loading').hide();
+        $('#todolist, .pager').show();
+
+      }
+    },
+    updateNote: function (taskId, note) {
+      if (this.tasks.length > taskId) {
+        this.tasks[taskId].notes = note;
+      }
+    }
+  };
+
+
+  $(function () {
+    TodoApp.init(20);
+  });
 </script>
 </body>
 </html>
